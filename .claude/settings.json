@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -w nHTTP:%{http_code} http://localhost:3003/auth/me)",
+      "Read(//c/Projects/05_doctor_voicebot/physician-workspace-web/**)",
+      "Bash(curl -s -w \"\\\\nHTTP:%{http_code}\" http://localhost:3003/api/auth/me)",
+      "Bash(ls -la \"c:\\\\Projects\\\\05_doctor_voicebot\\\\doctor-voicebot\\\\tests\"\" 2>/dev/null || echo \"tests directory might not exist \")",
+      "Bash(npm run:*)",
+      "Bash(grep -n \"TODO\\\\|FIXME\\\\|HACK\\\\|BUG\\\\|XXX\" /c/Projects/05_doctor_voicebot/doctor-voicebot/src/**/*.js)",
+      "Bash(npm test:*)",
+      "Bash(node -e \"import\\(''./src/core.js''\\).then\\(m => { const cfg = m.createConfig\\(\\); console.log\\(''provider:'', cfg.ai.provider\\); }\\).catch\\(e => console.error\\(e.message\\)\\)\")",
+      "Bash(node -e \"import\\(''./src/core.js''\\).then\\(m => console.log\\(Object.keys\\(m\\)\\)\\).catch\\(e => console.error\\(e.message\\)\\)\")",
+      "Bash(node -e \"import\\(''./src/core.js''\\).then\\(m => { const cfg = m.loadConfig\\(\\); console.log\\(''[config] AI provider:'', cfg.ai?.provider\\); }\\).catch\\(e => console.error\\(e.message\\)\\)\")",
+      "Bash(findstr \":8080 \")",
+      "Bash(findstr LISTENING)",
+      "Bash(findstr \":3003 \")",
+      "Bash(curl -s http://localhost:8080/health/live)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3003/)",
+      "Bash(curl -s http://localhost:3003/api/auth/me)",
+      "Bash(taskkill /PID 20296 /F)",
+      "Bash(taskkill /PID 29352 /F)",
+      "Bash(cmd /c \"taskkill /PID 20296 /F && taskkill /PID 29352 /F\")",
+      "Bash(cmd /c \"taskkill /PID 20296 /T /F 2>&1 & taskkill /PID 29352 /T /F 2>&1\")",
+      "Bash(powershell -Command \"Stop-Process -Id 20296 -Force; Stop-Process -Id 29352 -Force\")"
+    ]
+  }
+}
