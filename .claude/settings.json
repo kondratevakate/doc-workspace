@@ -21,7 +21,27 @@
       "Bash(taskkill /PID 29352 /F)",
       "Bash(cmd /c \"taskkill /PID 20296 /F && taskkill /PID 29352 /F\")",
       "Bash(cmd /c \"taskkill /PID 20296 /T /F 2>&1 & taskkill /PID 29352 /T /F 2>&1\")",
-      "Bash(powershell -Command \"Stop-Process -Id 20296 -Force; Stop-Process -Id 29352 -Force\")"
+      "Bash(powershell -Command \"Stop-Process -Id 20296 -Force; Stop-Process -Id 29352 -Force\")",
+      "Read(//c/Users/kondr/.claude\" 2>/dev/**)",
+      "Read(//c/Users/kondr/.claude//**)",
+      "Read(//c/Users/kondr/.claude/**)",
+      "WebFetch(domain:github.com)",
+      "Bash(curl -s https://api.github.com/repos/obra/superpowers/contents/skills)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(xargs -I {} sh -c 'echo \"=== {} ===\" && cat {}')",
+      "Bash(git clone:*)",
+      "Bash(mkdir -p /c/Users/kondr/.claude/plugins/my-skills/.claude-plugin /c/Users/kondr/.claude/plugins/my-skills/skills)",
+      "Bash(git -C /c/Users/kondr/.claude/plugins/my-skills init)",
+      "Bash(gh api:*)",
+      "Bash(powershell -Command \"gh api repos/evmts/tevm-monorepo/contents/.claude/commands/commit.md 2>&1\")",
+      "WebFetch(domain:api.github.com)",
+      "Bash(cp -r /tmp/cds/plugins/bundles/core-3d-animation /c/Users/kondr/.claude/plugins/)",
+      "Bash(cp -r /tmp/cds/plugins/bundles/extended-3d-scroll /c/Users/kondr/.claude/plugins/)",
+      "Bash(cp -r /tmp/cds/plugins/bundles/animation-components /c/Users/kondr/.claude/plugins/)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\kondr\\.claude\\plugins\\my-skills\\.claude-plugin",
+      "C:\\Users\\kondr\\.claude\\plugins\\my-skills\\skills\\commit"
     ]
   }
 }

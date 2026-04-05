@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { AppBar, BottomNavigation, BottomNavigationAction, Box, Button, Chip, Container, Stack, Toolbar, Typography } from '@mui/material';
 import { logout } from '@/src/lib/api';
+import { getDemoSession, resetDemoState } from '@/src/lib/demo-store';
+import { isDemoModeEnabled } from '@/src/lib/demo-mode';
 import { getPackUi } from '@/src/lib/packs';
 import { useAppStore } from '@/src/store/app-store';
 
@@ -28,9 +30,23 @@ export function WorkspaceShell({
   const router = useRouter();
   const physician = useAppStore((state) => state.physician);
   const activeConditionKey = useAppStore((state) => state.activeConditionKey);
+  const setSession = useAppStore((state) => state.setSession);
   const clearSession = useAppStore((state) => state.clearSession);
   const [loggingOut, setLoggingOut] = useState(false);
   const pack = useMemo(() => getPackUi(activeConditionKey), [activeConditionKey]);
+  const demoMode = isDemoModeEnabled();
+
+  function handleDemoReset() {
+    try {
+      setLoggingOut(true);
+      resetDemoState();
+      clearSession();
+      setSession(getDemoSession());
+      router.replace('/today');
+    } finally {
+      setLoggingOut(false);
+    }
+  }
 
   async function handleLogout() {
     try {
@@ -65,12 +81,19 @@ export function WorkspaceShell({
             </Typography>
           </Stack>
           <Stack alignItems="flex-end" spacing={1}>
+            {demoMode ? <Chip label="Demo mode" size="small" color="secondary" /> : null}
             <Typography variant="body2" sx={{ fontWeight: 700 }}>
               {physician?.displayName || 'Physician'}
             </Typography>
-            <Button variant="outlined" size="small" disabled={loggingOut} onClick={handleLogout}>
-              Log out
-            </Button>
+            {demoMode ? (
+              <Button variant="outlined" size="small" disabled={loggingOut} onClick={handleDemoReset}>
+                Reset demo
+              </Button>
+            ) : (
+              <Button variant="outlined" size="small" disabled={loggingOut} onClick={handleLogout}>
+                Log out
+              </Button>
+            )}
           </Stack>
         </Toolbar>
       </AppBar>

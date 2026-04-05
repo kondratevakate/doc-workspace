@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { getMe } from '@/src/lib/api';
+import { getDemoSession } from '@/src/lib/demo-store';
+import { isDemoModeEnabled } from '@/src/lib/demo-mode';
 import { useAppStore } from '@/src/store/app-store';
 
 export function useAuthGuard() {
@@ -16,6 +18,14 @@ export function useAuthGuard() {
   useEffect(() => {
     let active = true;
     if (physician) {
+      setLoading(false);
+      return () => {
+        active = false;
+      };
+    }
+
+    if (isDemoModeEnabled()) {
+      setSession(getDemoSession());
       setLoading(false);
       return () => {
         active = false;

@@ -18,19 +18,48 @@ Web-first physician workspace for case capture, draft review, due queues, and li
 
 ## Local run
 
-1. Start the backend in `C:\Projects\atelic\doctor-voicebot`
-2. Set `WEB_APP_ORIGIN=http://localhost:3001` in the backend `.env`
-3. In this app, keep `NEXT_PUBLIC_API_BASE_URL=/api`
-4. Run:
+### Demo mode without backend
+
+Create `.env.local` with:
+
+```bash
+NEXT_PUBLIC_DEMO_MODE=1
+NEXT_PUBLIC_API_BASE_URL=/api
+```
+
+For the most reliable local demo run:
+
+```bash
+npm install
+npm run demo
+```
+
+Open `http://localhost:3003/today`.
+
+This mode does not require authentication and does not call the backend. It uses local fixture data stored in `localStorage`.
+
+If you need hot reload while editing, `npm run dev` is also available on the same port.
+
+### Real mode with backend
+
+Create `.env.local` with:
+
+```bash
+NEXT_PUBLIC_DEMO_MODE=0
+NEXT_PUBLIC_API_BASE_URL=/api
+BACKEND_URL=http://127.0.0.1:8080
+```
+
+Then start the compatible backend separately and run:
 
 ```bash
 npm install
 npm run dev
 ```
 
-The app serves on `http://localhost:3001`.
+The app serves on `http://localhost:3003`.
 
-For phone testing, expose only the frontend port. The app proxies `/api/*` to the backend on `127.0.0.1:8000`, so one public origin is enough.
+In real mode the frontend proxies `/api/*` to `BACKEND_URL`.
 
 ## Key routes
 

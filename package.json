@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack --port 3003",
+    "dev": "next dev --port 3003",
     "build": "next build",
+    "demo": "npm run build && npm run start",
     "start": "next start -p 3003",
     "type-check": "tsc --noEmit"
   },
