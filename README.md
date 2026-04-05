@@ -23,9 +23,11 @@ Web-first physician workspace for case capture, draft review, due queues, and li
 Create `.env.local` with:
 
 ```bash
-NEXT_PUBLIC_DEMO_MODE=1
+NEXT_PUBLIC_DEMO_MODE=0
 NEXT_PUBLIC_API_BASE_URL=/api
 ```
+
+Then open `/login` and switch the mode toggle to `Demo`.
 
 For the most reliable local demo run:
 
@@ -36,7 +38,9 @@ npm run demo
 
 Open `http://localhost:3003/today`.
 
-This mode does not require authentication and does not call the backend. It uses local fixture data stored in `localStorage`.
+Demo mode does not require authentication and does not call the backend. It uses local fixture data stored in `localStorage`.
+
+The mode toggle and the `EN/RU` language toggle are available in the UI. `NEXT_PUBLIC_DEMO_MODE` now controls only the default mode on first load.
 
 If you need hot reload while editing, `npm run dev` is also available on the same port.
 
