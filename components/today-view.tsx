@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Alert, Button, Grid, Paper, Stack, Typography } from '@mui/material';
 import { ApiError, getTodayQueues } from '@/src/lib/api';
 import { getPackUi } from '@/src/lib/packs';
 import type { TodayQueues } from '@/src/lib/types';
+import { useI18n } from '@/src/lib/use-i18n';
 import { useAuthGuard } from '@/src/lib/use-auth';
 import { useAppStore } from '@/src/store/app-store';
 import { CaseCard } from './case-card';
@@ -15,10 +16,12 @@ import { WorkspaceShell } from './workspace-shell';
 
 export function TodayView() {
   const { physician, loading } = useAuthGuard();
+  const { locale, t } = useI18n();
   const activeConditionKey = useAppStore((state) => state.activeConditionKey);
   const [queues, setQueues] = useState<TodayQueues | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const pack = useMemo(() => getPackUi(activeConditionKey, locale), [activeConditionKey, locale]);
 
   useEffect(() => {
     if (!physician) return;
@@ -30,20 +33,18 @@ export function TodayView() {
       })
       .catch((fetchError) => {
         if (!active) return;
-        setError(fetchError instanceof ApiError ? fetchError.message : 'Could not load queues.');
+        setError(fetchError instanceof ApiError ? fetchError.message : t('today.loadQueuesError'));
       });
     return () => {
       active = false;
     };
-  }, [physician, activeConditionKey, refreshKey]);
+  }, [physician, activeConditionKey, refreshKey, t]);
 
-  if (loading || !physician) return <LoadingState label="Loading physician workspace..." />;
-
-  const pack = getPackUi(activeConditionKey);
+  if (loading || !physician) return <LoadingState label={t('today.loadingWorkspace')} />;
 
   return (
-    <WorkspaceShell title="Today" subtitle={pack.heroSubtitle}>
-      <SectionCard title="Daily posture" eyebrow="Launch pack">
+    <WorkspaceShell title={t('today.title')} subtitle={pack.heroSubtitle}>
+      <SectionCard title={t('today.dailyPosture')} eyebrow={t('today.launchPack')}>
         <Typography color="text.secondary">{pack.cohortDescription}</Typography>
       </SectionCard>
 
@@ -52,41 +53,41 @@ export function TodayView() {
       {queues ? (
         <Grid container spacing={1.25}>
           <Grid size={6}>
-            <StatCard label="Due today" value={queues.stats.dueToday} />
+            <StatCard label={t('today.dueToday')} value={queues.stats.dueToday} />
           </Grid>
           <Grid size={6}>
-            <StatCard label="Overdue" value={queues.stats.overdue} tone="warm" />
+            <StatCard label={t('today.overdue')} value={queues.stats.overdue} tone="warm" />
           </Grid>
           <Grid size={6}>
-            <StatCard label="Non-responder" value={queues.stats.nonResponder} />
+            <StatCard label={t('today.nonResponder')} value={queues.stats.nonResponder} />
           </Grid>
           <Grid size={6}>
-            <StatCard label="Drafts" value={queues.stats.unresolvedDrafts} />
+            <StatCard label={t('today.drafts')} value={queues.stats.unresolvedDrafts} />
           </Grid>
         </Grid>
       ) : (
-        <LoadingState label="Loading today queues..." />
+        <LoadingState label={t('today.loadingQueues')} />
       )}
 
       {queues ? (
         <>
-          <QueueSection title="Due today" items={queues.dueToday} emptyLabel="No cases due today." />
-          <QueueSection title="Overdue" items={queues.overdue} emptyLabel="No overdue cases." />
-          <QueueSection title="Non-responder" items={queues.nonResponder} emptyLabel="No non-responder cases right now." />
-          <QueueSection title="No next step" items={queues.noNextStep} emptyLabel="Every open case has a next step." />
-          <SectionCard title="Drafts unresolved" eyebrow="Review queue">
+          <QueueSection title={t('today.dueToday')} items={queues.dueToday} emptyLabel={t('today.noCasesDueToday')} />
+          <QueueSection title={t('today.overdue')} items={queues.overdue} emptyLabel={t('today.noOverdueCases')} />
+          <QueueSection title={t('today.nonResponder')} items={queues.nonResponder} emptyLabel={t('today.noNonResponderCases')} />
+          <QueueSection title={t('today.noNextStep')} items={queues.noNextStep} emptyLabel={t('today.everyCaseHasNextStep')} />
+          <SectionCard title={t('today.draftsUnresolved')} eyebrow={t('today.reviewQueue')}>
             <Stack spacing={1.25}>
               {queues.unresolvedDrafts.length ? (
                 queues.unresolvedDrafts.map((draft) => (
                   <Paper key={draft.id} component={Link} href={`/capture?draft=${draft.id}`} elevation={0} sx={{ p: 2, border: '1px solid rgba(22,32,36,0.08)' }}>
                     <Stack spacing={1}>
-                      <Typography sx={{ fontWeight: 700 }}>Draft #{draft.id}</Typography>
-                      <Typography color="text.secondary">{draft.summary || draft.transcript || 'Transcript pending.'}</Typography>
+                      <Typography sx={{ fontWeight: 700 }}>{t('common.draftNumber', { id: draft.id })}</Typography>
+                      <Typography color="text.secondary">{draft.summary || draft.transcript || t('today.transcriptPending')}</Typography>
                     </Stack>
                   </Paper>
                 ))
               ) : (
-                <Typography color="text.secondary">No unresolved drafts.</Typography>
+                <Typography color="text.secondary">{t('today.noUnresolvedDrafts')}</Typography>
               )}
             </Stack>
           </SectionCard>
@@ -94,7 +95,7 @@ export function TodayView() {
       ) : null}
 
       <Button variant="outlined" onClick={() => setRefreshKey((value) => value + 1)}>
-        Refresh queues
+        {t('today.refreshQueues')}
       </Button>
     </WorkspaceShell>
   );

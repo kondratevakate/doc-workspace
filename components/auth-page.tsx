@@ -3,23 +3,42 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Alert, Box, Button, Container, Paper, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Container, Paper, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { requestMagicLink } from '@/src/lib/api';
 import { getDemoSession, resetDemoState } from '@/src/lib/demo-store';
-import { isDemoModeEnabled } from '@/src/lib/demo-mode';
+import type { AppLocale, AppMode } from '@/src/lib/preferences';
+import { useI18n } from '@/src/lib/use-i18n';
 import { useAppStore } from '@/src/store/app-store';
 
 export function AuthPage({ nextPath = '/today' }: { nextPath?: string }) {
   const router = useRouter();
-  const demoMode = isDemoModeEnabled();
+  const { locale, t } = useI18n();
+  const appMode = useAppStore((state) => state.appMode);
+  const setAppMode = useAppStore((state) => state.setAppMode);
+  const setLocale = useAppStore((state) => state.setLocale);
   const setSession = useAppStore((state) => state.setSession);
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [verifyUrl, setVerifyUrl] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const demoMode = appMode === 'demo';
+
+  function handleLocaleChange(_: React.MouseEvent<HTMLElement>, nextLocale: AppLocale | null) {
+    if (!nextLocale) return;
+    setLocale(nextLocale);
+  }
+
+  function handleModeChange(_: React.MouseEvent<HTMLElement>, nextMode: AppMode | null) {
+    if (!nextMode) return;
+    setAppMode(nextMode);
+    setMessage(null);
+    setError(null);
+    setVerifyUrl(null);
+  }
 
   function enterDemo(resetState = false) {
+    setAppMode('demo');
     if (resetState) {
       resetDemoState();
     }
@@ -37,55 +56,12 @@ export function AuthPage({ nextPath = '/today' }: { nextPath?: string }) {
       const redirectTo = typeof window === 'undefined' ? nextPath : `${window.location.origin}${nextPath}`;
       const result = await requestMagicLink(email, redirectTo);
       setVerifyUrl(rebaseVerifyUrl(result.verifyUrl, redirectTo));
-      setMessage(result.verifyUrl ? 'Development magic link generated.' : 'Magic link requested. Check the physician inbox.');
+      setMessage(result.verifyUrl ? t('auth.magicLinkGenerated') : t('auth.magicLinkRequested'));
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : 'Could not request magic link.');
+      setError(submitError instanceof Error ? submitError.message : t('auth.requestMagicLinkError'));
     } finally {
       setSubmitting(false);
     }
-  }
-
-  if (demoMode) {
-    return (
-      <Container maxWidth="sm" sx={{ minHeight: '100vh', display: 'grid', placeItems: 'center', px: 2 }}>
-        <Paper
-          elevation={0}
-          sx={{
-            width: '100%',
-            p: 3,
-            borderRadius: 6,
-            border: '1px solid rgba(22,32,36,0.08)',
-            background: 'linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(255,255,255,0.82) 100%)',
-            boxShadow: '0 18px 48px rgba(22,32,36,0.12)'
-          }}
-        >
-          <Stack spacing={2.25}>
-            <Box>
-              <Typography variant="overline" sx={{ color: 'text.secondary', letterSpacing: '0.12em' }}>
-                Demo mode
-              </Typography>
-              <Typography variant="h3" className="serif-display" sx={{ mt: 1 }}>
-                Local physician walkthrough, no authentication required.
-              </Typography>
-            </Box>
-            <Typography color="text.secondary">
-              `NEXT_PUBLIC_DEMO_MODE=1` is enabled, so the workspace runs on local fixtures and does not call backend auth or API endpoints.
-            </Typography>
-            <Alert severity="info">
-              Use this mode to demo Today, Capture, Drafts, Cohort, and Case detail flows without starting the backend.
-            </Alert>
-            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-              <Button variant="contained" size="large" onClick={() => enterDemo(false)}>
-                Enter demo workspace
-              </Button>
-              <Button variant="outlined" size="large" onClick={() => enterDemo(true)}>
-                Reset demo data
-              </Button>
-            </Stack>
-          </Stack>
-        </Paper>
-      </Container>
-    );
   }
 
   return (
@@ -102,37 +78,63 @@ export function AuthPage({ nextPath = '/today' }: { nextPath?: string }) {
         }}
       >
         <Stack spacing={2.25}>
+          <Stack direction="row" justifyContent="space-between" flexWrap="wrap" useFlexGap spacing={1.25}>
+            <ToggleButtonGroup size="small" exclusive value={appMode} onChange={handleModeChange} color="primary">
+              <ToggleButton value="main">{t('common.main')}</ToggleButton>
+              <ToggleButton value="demo">{t('common.demo')}</ToggleButton>
+            </ToggleButtonGroup>
+            <ToggleButtonGroup size="small" exclusive value={locale} onChange={handleLocaleChange} color="primary">
+              <ToggleButton value="en">{t('common.english')}</ToggleButton>
+              <ToggleButton value="ru">{t('common.russian')}</ToggleButton>
+            </ToggleButtonGroup>
+          </Stack>
+
           <Box>
             <Typography variant="overline" sx={{ color: 'text.secondary', letterSpacing: '0.12em' }}>
-              UAE physician workspace
+              {demoMode ? t('auth.demoEyebrow') : t('auth.eyebrow')}
             </Typography>
             <Typography variant="h3" className="serif-display" sx={{ mt: 1 }}>
-              Secure case follow-up, built for the phone.
+              {demoMode ? t('auth.demoTitle') : t('auth.title')}
             </Typography>
           </Box>
-          <Typography color="text.secondary">
-            This workspace stores voice drafts, case cards, and follow-up queues in the secured web application, not in a messenger thread.
-          </Typography>
-          <Box component="form" onSubmit={handleSubmit}>
-            <Stack spacing={2}>
-              <TextField
-                required
-                type="email"
-                label="Physician email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                autoComplete="email"
-              />
-              <Button type="submit" variant="contained" size="large" disabled={submitting || !email.trim()}>
-                {submitting ? 'Preparing link...' : 'Request magic link'}
-              </Button>
-            </Stack>
-          </Box>
+
+          <Typography color="text.secondary">{demoMode ? t('auth.demoDescription') : t('auth.description')}</Typography>
+
+          {demoMode ? (
+            <>
+              <Alert severity="info">{t('auth.demoNotice')}</Alert>
+              <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                <Button variant="contained" size="large" onClick={() => enterDemo(false)}>
+                  {t('auth.enterDemo')}
+                </Button>
+                <Button variant="outlined" size="large" onClick={() => enterDemo(true)}>
+                  {t('auth.resetDemoData')}
+                </Button>
+              </Stack>
+            </>
+          ) : (
+            <Box component="form" onSubmit={handleSubmit}>
+              <Stack spacing={2}>
+                <TextField
+                  required
+                  type="email"
+                  label={t('auth.physicianEmail')}
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  autoComplete="email"
+                />
+                <Button type="submit" variant="contained" size="large" disabled={submitting || !email.trim()}>
+                  {submitting ? t('auth.preparingLink') : t('auth.requestMagicLink')}
+                </Button>
+              </Stack>
+            </Box>
+          )}
+
           {message ? <Alert severity="success">{message}</Alert> : null}
           {error ? <Alert severity="error">{error}</Alert> : null}
           {verifyUrl ? (
-            <Alert severity="info" action={<Button component={Link} href={verifyUrl}>Open</Button>}>
-              Development mode is returning the verification link directly so you can continue without email delivery.
+            <Alert severity="info" action={<Button component={Link} href={verifyUrl}>{t('auth.open')}</Button>}>
+              {t('auth.developmentLinkNotice')}
             </Alert>
           ) : null}
         </Stack>

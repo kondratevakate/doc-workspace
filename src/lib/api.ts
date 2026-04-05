@@ -1,5 +1,5 @@
 import { commitDemoVoiceDraft, createDemoVoiceDraft, getDemoCaseDetail, getDemoCohortSummary, getDemoSession, getDemoTodayQueues, getDemoVoiceDraft, listDemoCases, listDemoVoiceDrafts, resetDemoState } from '@/src/lib/demo-store';
-import { isDemoModeEnabled } from '@/src/lib/demo-mode';
+import { isDemoModeEnabled } from '@/src/lib/preferences';
 import type { CaseCard, CaseDetail, CohortSummary, MagicLinkResponse, PhysicianSession, TodayQueues, VoiceDraft } from '@/src/lib/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '/api';

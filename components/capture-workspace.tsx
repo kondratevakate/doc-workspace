@@ -2,10 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Alert, Box, Button, Chip, FormControl, InputLabel, MenuItem, Paper, Select, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Button, Chip, FormControl, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import { ApiError, buildApiUrl, commitVoiceDraft, createVoiceDraft, getVoiceDraft, listCases } from '@/src/lib/api';
 import { getPackUi } from '@/src/lib/packs';
 import type { CaseCard, VoiceDraft } from '@/src/lib/types';
+import { useI18n } from '@/src/lib/use-i18n';
 import { useAuthGuard } from '@/src/lib/use-auth';
 import { useAppStore } from '@/src/store/app-store';
 import { LoadingState } from './loading-state';
@@ -16,6 +17,7 @@ type CaptureMode = 'new' | 'existing';
 
 export function CaptureWorkspace() {
   const { physician, loading } = useAuthGuard();
+  const { locale, t } = useI18n();
   const activeConditionKey = useAppStore((state) => state.activeConditionKey);
   const router = useRouter();
   const [draft, setDraft] = useState<VoiceDraft | null>(null);
@@ -32,13 +34,17 @@ export function CaptureWorkspace() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const pollRef = useRef<number | null>(null);
-  const pack = useMemo(() => getPackUi(activeConditionKey), [activeConditionKey]);
+  const pack = useMemo(() => getPackUi(activeConditionKey, locale), [activeConditionKey, locale]);
 
   const hydrateDraft = useCallback((nextDraft: VoiceDraft) => {
     setDraft(nextDraft);
     setSummary(nextDraft.summary || '');
     setDueAt(nextDraft.dueAt || '');
     setConditionPayload(nextDraft.conditionPayload || {});
+    if (nextDraft.committedCaseId) {
+      setMode('existing');
+      setSelectedCaseId(nextDraft.committedCaseId);
+    }
   }, []);
 
   useEffect(() => {
@@ -55,12 +61,11 @@ export function CaptureWorkspace() {
     getVoiceDraft(draftId)
       .then((result) => {
         hydrateDraft(result);
-        if (result.committedCaseId) setMode('existing');
       })
       .catch((fetchError) => {
-        setError(fetchError instanceof Error ? fetchError.message : 'Could not load draft.');
+        setError(fetchError instanceof Error ? fetchError.message : t('capture.loadDraftError'));
       });
-  }, [physician, hydrateDraft]);
+  }, [physician, hydrateDraft, t]);
 
   useEffect(() => () => {
     if (pollRef.current) window.clearTimeout(pollRef.current);
@@ -69,7 +74,7 @@ export function CaptureWorkspace() {
   const startRecording = useCallback(async () => {
     setError(null);
     if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
-      setError('Recording is not available in this browser. Use the upload fallback.');
+      setError(t('capture.browserRecordingUnavailable'));
       return;
     }
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -87,7 +92,7 @@ export function CaptureWorkspace() {
     mediaRecorderRef.current = recorder;
     recorder.start();
     setRecording(true);
-  }, []);
+  }, [t]);
 
   const stopRecording = useCallback(() => {
     mediaRecorderRef.current?.stop();
@@ -95,7 +100,7 @@ export function CaptureWorkspace() {
 
   async function uploadBlob(blob: Blob, contentType: string) {
     setBusy(true);
-    setInfo('Uploading voice note...');
+    setInfo(t('capture.uploadingVoice'));
     setError(null);
     try {
       const audioBase64 = await blobToBase64(blob);
@@ -103,13 +108,13 @@ export function CaptureWorkspace() {
         conditionKey: activeConditionKey,
         audioBase64,
         contentType,
-        languageCode: 'en'
+        languageCode: locale === 'ru' ? 'ru' : 'en'
       });
       hydrateDraft(created);
-      setInfo('Voice note received. Building draft...');
+      setInfo(t('capture.voiceReceived'));
       pollDraft(created.id);
     } catch (uploadError) {
-      setError(uploadError instanceof Error ? uploadError.message : 'Could not upload voice note.');
+      setError(uploadError instanceof Error ? uploadError.message : t('capture.uploadVoiceError'));
       setBusy(false);
       setInfo(null);
     }
@@ -124,11 +129,11 @@ export function CaptureWorkspace() {
         const ready = current.status === 'done' || Boolean(current.transcript);
         if (ready) {
           setBusy(false);
-          setInfo(current.reviewState === 'ready' ? 'Draft ready for review.' : 'Draft needs review before commit.');
+          setInfo(current.reviewState === 'ready' ? t('capture.draftReady') : t('capture.draftNeedsReview'));
           return;
         }
       } catch (pollError) {
-        setError(pollError instanceof Error ? pollError.message : 'Could not refresh draft status.');
+        setError(pollError instanceof Error ? pollError.message : t('capture.refreshDraftError'));
         setBusy(false);
         return;
       }
@@ -157,52 +162,50 @@ export function CaptureWorkspace() {
         dueAt,
         conditionPayload
       });
-      setInfo(`Case ${result.case.case.caseToken} saved.`);
+      setInfo(t('capture.caseSaved', { caseToken: result.case.case.caseToken }));
       router.push(`/cases/${result.case.case.id}`);
     } catch (commitError) {
       if (commitError instanceof ApiError && typeof commitError.payload === 'object' && commitError.payload && 'draft' in commitError.payload) {
         const nextDraft = (commitError.payload as { draft?: VoiceDraft }).draft;
         if (nextDraft) hydrateDraft(nextDraft);
       }
-      setError(commitError instanceof Error ? commitError.message : 'Could not commit draft.');
+      setError(commitError instanceof Error ? commitError.message : t('capture.commitDraftError'));
     } finally {
       setBusy(false);
     }
   }
 
-  if (loading || !physician) return <LoadingState label="Loading capture workspace..." />;
+  if (loading || !physician) return <LoadingState label={t('capture.loading')} />;
 
   return (
-    <WorkspaceShell title="Capture" subtitle="Record directly in the workspace. Messenger transport is deliberately out of scope.">
+    <WorkspaceShell title={t('capture.title')} subtitle={t('capture.subtitle')}>
       {error ? <Alert severity="error">{error}</Alert> : null}
       {info ? <Alert severity="info">{info}</Alert> : null}
 
-      <SectionCard title="New note" eyebrow="Voice capture">
+      <SectionCard title={t('capture.newNote')} eyebrow={t('capture.voiceCapture')}>
         <Stack spacing={1.5}>
-          <Typography color="text.secondary">
-            Capture one longitudinal update. The canonical case is created or updated only after review and commit.
-          </Typography>
+          <Typography color="text.secondary">{t('capture.description')}</Typography>
           <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
             <Button variant="contained" onClick={recording ? stopRecording : startRecording} disabled={busy}>
-              {recording ? 'Stop recording' : 'Start recording'}
+              {recording ? t('capture.stopRecording') : t('capture.startRecording')}
             </Button>
             <Button variant="outlined" component="label" disabled={busy}>
-              Upload audio
+              {t('capture.uploadAudio')}
               <input hidden accept="audio/*" type="file" onChange={handleFileChange} />
             </Button>
           </Stack>
-          {recording ? <Chip color="secondary" label="Recording in progress" sx={{ alignSelf: 'flex-start' }} /> : null}
+          {recording ? <Chip color="secondary" label={t('capture.recordingInProgress')} sx={{ alignSelf: 'flex-start' }} /> : null}
         </Stack>
       </SectionCard>
 
       {draft ? (
-        <SectionCard title={`Draft #${draft.id}`} eyebrow={pack.label}>
+        <SectionCard title={t('common.draftNumber', { id: draft.id })} eyebrow={pack.label}>
           <Stack spacing={2}>
             {draft.audioUrl ? <audio controls preload="none" src={buildApiUrl(draft.audioUrl)} /> : null}
-            <Typography color="text.secondary">{draft.transcript || 'Transcript is still processing.'}</Typography>
-            <TextField label="Summary" value={summary} onChange={(event) => setSummary(event.target.value)} multiline minRows={3} />
+            <Typography color="text.secondary">{draft.transcript || t('capture.transcriptProcessing')}</Typography>
+            <TextField label={t('capture.summary')} value={summary} onChange={(event) => setSummary(event.target.value)} multiline minRows={3} />
             <TextField
-              label="Next follow-up due"
+              label={t('capture.nextFollowupDue')}
               type="date"
               value={dueAt}
               onChange={(event) => setDueAt(event.target.value)}
@@ -211,19 +214,19 @@ export function CaptureWorkspace() {
 
             <Stack direction="row" spacing={1}>
               <Button variant={mode === 'new' ? 'contained' : 'outlined'} onClick={() => setMode('new')}>
-                New case
+                {t('capture.newCase')}
               </Button>
               <Button variant={mode === 'existing' ? 'contained' : 'outlined'} onClick={() => setMode('existing')}>
-                Existing case
+                {t('capture.existingCase')}
               </Button>
             </Stack>
 
             {mode === 'existing' ? (
               <FormControl fullWidth>
-                <InputLabel id="case-select-label">Attach to case</InputLabel>
+                <InputLabel id="case-select-label">{t('capture.attachToCase')}</InputLabel>
                 <Select
                   labelId="case-select-label"
-                  label="Attach to case"
+                  label={t('capture.attachToCase')}
                   value={selectedCaseId}
                   onChange={(event) => setSelectedCaseId(Number(event.target.value))}
                 >
@@ -246,7 +249,7 @@ export function CaptureWorkspace() {
                     value={conditionPayload[field.key] || ''}
                     onChange={(event) => setConditionPayload((current) => ({ ...current, [field.key]: String(event.target.value) || null }))}
                   >
-                    <MenuItem value="">Not set</MenuItem>
+                    <MenuItem value="">{t('common.notSet')}</MenuItem>
                     {field.options?.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
                         {option.label}
@@ -265,7 +268,7 @@ export function CaptureWorkspace() {
             )}
 
             <Button variant="contained" size="large" disabled={busy || !draft || !summary.trim() || !dueAt || (mode === 'existing' && !selectedCaseId)} onClick={handleCommit}>
-              Commit draft
+              {t('capture.commitDraft')}
             </Button>
           </Stack>
         </SectionCard>

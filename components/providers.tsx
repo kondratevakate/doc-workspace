@@ -1,6 +1,8 @@
 'use client';
 
+import { useEffect } from 'react';
 import { CssBaseline, GlobalStyles, ThemeProvider, createTheme } from '@mui/material';
+import { useAppStore } from '@/src/store/app-store';
 
 const theme = createTheme({
   palette: {
@@ -70,6 +72,16 @@ const theme = createTheme({
   }
 });
 
+function PreferencesBootstrap() {
+  const hydratePreferences = useAppStore((state) => state.hydratePreferences);
+
+  useEffect(() => {
+    hydratePreferences();
+  }, [hydratePreferences]);
+
+  return null;
+}
+
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider theme={theme}>
@@ -82,6 +94,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           }
         }}
       />
+      <PreferencesBootstrap />
       {children}
     </ThemeProvider>
   );
