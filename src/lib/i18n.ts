@@ -103,6 +103,24 @@ type TranslationKey =
   | 'capture.commitDraft'
   | 'capture.caseSaved'
   | 'capture.commitDraftError'
+  | 'capture.tapToRecord'
+  | 'capture.startCaptureHint'
+  | 'capture.tapToStop'
+  | 'capture.processingAudio'
+  | 'capture.recordAgain'
+  | 'capture.reviewDraft'
+  | 'capture.quickInput'
+  | 'capture.backToVoice'
+  | 'capture.visitType'
+  | 'capture.visitPrimary'
+  | 'capture.visitFollowup'
+  | 'capture.patientInitial'
+  | 'capture.discussed'
+  | 'capture.nextVisit'
+  | 'capture.in1Week'
+  | 'capture.in2Weeks'
+  | 'capture.in1Month'
+  | 'capture.in3Months'
   | 'case.titleFallback'
   | 'case.subtitle'
   | 'case.loading'
@@ -228,6 +246,24 @@ const messages: Record<AppLocale, Record<TranslationKey, string>> = {
     'capture.commitDraft': 'Commit draft',
     'capture.caseSaved': 'Case {caseToken} saved.',
     'capture.commitDraftError': 'Could not commit draft.',
+    'capture.tapToRecord': 'Tap to dictate',
+    'capture.startCaptureHint': 'Start capturing session notes',
+    'capture.tapToStop': 'Tap to stop',
+    'capture.processingAudio': 'Processing audio...',
+    'capture.recordAgain': 'Record again',
+    'capture.reviewDraft': 'Review draft',
+    'capture.quickInput': 'Quick Input',
+    'capture.backToVoice': 'Back to voice',
+    'capture.visitType': 'Visit type',
+    'capture.visitPrimary': 'Primary',
+    'capture.visitFollowup': 'Follow-up',
+    'capture.patientInitial': 'Patient initial',
+    'capture.discussed': 'Discussed',
+    'capture.nextVisit': 'Next visit',
+    'capture.in1Week': '1 week',
+    'capture.in2Weeks': '2 weeks',
+    'capture.in1Month': '1 month',
+    'capture.in3Months': '3 months',
     'case.titleFallback': 'Case',
     'case.subtitle': 'Canonical case card with updates and task evidence.',
     'case.loading': 'Loading case...',
@@ -352,6 +388,24 @@ const messages: Record<AppLocale, Record<TranslationKey, string>> = {
     'capture.commitDraft': 'Закоммитить драфт',
     'capture.caseSaved': 'Кейс {caseToken} сохранён.',
     'capture.commitDraftError': 'Не удалось закоммитить драфт.',
+    'capture.tapToRecord': 'Нажми для диктовки',
+    'capture.startCaptureHint': 'Начни запись заметок',
+    'capture.tapToStop': 'Нажми для остановки',
+    'capture.processingAudio': 'Обработка аудио...',
+    'capture.recordAgain': 'Записать снова',
+    'capture.reviewDraft': 'Проверь драфт',
+    'capture.quickInput': 'Быстрый ввод',
+    'capture.backToVoice': 'Вернуться к голосу',
+    'capture.visitType': 'Тип приёма',
+    'capture.visitPrimary': 'Первичный',
+    'capture.visitFollowup': 'Повторный',
+    'capture.patientInitial': 'Инициал пациента',
+    'capture.discussed': 'Обсуждали',
+    'capture.nextVisit': 'Следующий визит',
+    'capture.in1Week': '1 неделя',
+    'capture.in2Weeks': '2 недели',
+    'capture.in1Month': '1 месяц',
+    'capture.in3Months': '3 месяца',
     'case.titleFallback': 'Кейс',
     'case.subtitle': 'Каноническая карточка кейса с обновлениями и следами задач.',
     'case.loading': 'Загружаю кейс...',
