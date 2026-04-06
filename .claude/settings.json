@@ -40,7 +40,12 @@
       "Bash(cp -r /tmp/cds/plugins/bundles/animation-components /c/Users/kondr/.claude/plugins/)",
       "Read(//c/Projects/05_doctor_voicebot/**)",
       "Bash(find /c/Projects/05_doctor_voicebot/physician-workspace-web/src -type f \\\\\\( -name \"*.tsx\" -o -name \"*.ts\" \\\\\\) -exec grep -l \"createVoiceDraft\\\\|MediaRecorder\\\\|getUserMedia\" {} \\\\;)",
-      "Bash(find /c/Projects/05_doctor_voicebot/physician-workspace-web/src -type f -name \"*.tsx\" -exec grep -l \"capture\\\\|record\\\\|draft\" {} \\\\;)"
+      "Bash(find /c/Projects/05_doctor_voicebot/physician-workspace-web/src -type f -name \"*.tsx\" -exec grep -l \"capture\\\\|record\\\\|draft\" {} \\\\;)",
+      "WebSearch",
+      "WebFetch(domain:pmc.ncbi.nlm.nih.gov)",
+      "WebFetch(domain:www.nature.com)",
+      "WebFetch(domain:www.sciencedirect.com)",
+      "WebFetch(domain:www.usa.philips.com)"
     ],
     "additionalDirectories": [
       "C:\\Users\\kondr\\.claude\\plugins\\my-skills\\.claude-plugin",

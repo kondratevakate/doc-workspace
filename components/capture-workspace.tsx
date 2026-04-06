@@ -333,7 +333,7 @@ export function CaptureWorkspace() {
       {commitError ? <Alert severity="error">{commitError}</Alert> : null}
 
       {/* ── Mode toggle: Voice / Quick Input ── */}
-      <Stack direction="row" spacing={1} justifyContent="flex-end">
+      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
         <Button
           variant={captureMode === 'voice' ? 'contained' : 'outlined'}
           size="small"
@@ -348,7 +348,7 @@ export function CaptureWorkspace() {
         >
           ⌨ {t('capture.quickInput')}
         </Button>
-      </Stack>
+      </Box>
 
       {captureMode === 'voice' ? (
         <VoicePanel

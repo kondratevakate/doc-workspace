@@ -157,20 +157,20 @@ export function WorkspaceShell({
       {/* Bottom controls */}
       <Divider sx={{ my: 2 }} />
       <Stack spacing={1.25}>
-        <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
-          <ToggleButtonGroup size="small" exclusive value={appMode} onChange={handleModeChange} color="primary">
-            <ToggleButton value="main" sx={{ fontSize: '0.72rem', py: 0.4, px: 0.9 }}>
+        <Stack spacing={0.5}>
+          <ToggleButtonGroup size="small" exclusive value={appMode} onChange={handleModeChange} color="primary" fullWidth>
+            <ToggleButton value="main" sx={{ fontSize: '0.72rem', py: 0.4 }}>
               {t('common.main')}
             </ToggleButton>
-            <ToggleButton value="demo" sx={{ fontSize: '0.72rem', py: 0.4, px: 0.9 }}>
+            <ToggleButton value="demo" sx={{ fontSize: '0.72rem', py: 0.4 }}>
               {t('common.demo')}
             </ToggleButton>
           </ToggleButtonGroup>
-          <ToggleButtonGroup size="small" exclusive value={locale} onChange={handleLocaleChange} color="primary">
-            <ToggleButton value="en" sx={{ fontSize: '0.72rem', py: 0.4, px: 0.9 }}>
+          <ToggleButtonGroup size="small" exclusive value={locale} onChange={handleLocaleChange} color="primary" fullWidth>
+            <ToggleButton value="en" sx={{ fontSize: '0.72rem', py: 0.4 }}>
               {t('common.english')}
             </ToggleButton>
-            <ToggleButton value="ru" sx={{ fontSize: '0.72rem', py: 0.4, px: 0.9 }}>
+            <ToggleButton value="ru" sx={{ fontSize: '0.72rem', py: 0.4 }}>
               {t('common.russian')}
             </ToggleButton>
           </ToggleButtonGroup>
@@ -201,7 +201,7 @@ export function WorkspaceShell({
   };
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+    <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
       {/* ── Desktop permanent sidebar ── */}
       <Box
         component="nav"
@@ -239,7 +239,7 @@ export function WorkspaceShell({
       </Drawer>
 
       {/* ── Main column ── */}
-      <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ flex: 1, minWidth: 0, maxWidth: '100%', display: 'flex', flexDirection: 'column' }}>
         {/* Mobile header */}
         <AppBar
           position="sticky"
@@ -271,12 +271,12 @@ export function WorkspaceShell({
         <Box
           sx={{
             flex: 1,
-            px: { xs: 2, md: 4, lg: 5 },
+            px: { xs: 2, md: 3 },
             pt: { xs: 2.5, md: 4 },
             pb: { xs: 12, md: 5 },
           }}
         >
-          <Stack spacing={2.25} sx={{ maxWidth: { md: 680 } }}>
+          <Stack spacing={2.25} sx={{ maxWidth: 680 }}>
             {/* Desktop page heading */}
             <Box sx={{ display: { xs: 'none', md: 'block' }, mb: 0.5 }}>
               <Typography variant="h4" className="serif-display" sx={{ fontStyle: 'italic', fontWeight: 500, letterSpacing: '-0.02em' }}>
@@ -327,13 +327,13 @@ export function WorkspaceShell({
       {rightPanel ? (
         <Box
           sx={{
-            display: { xs: 'none', lg: 'flex' },
+            display: { xs: 'none', md: 'flex' },
             flexDirection: 'column',
             width: 280,
             flexShrink: 0,
             position: 'sticky',
             top: 0,
-            height: '100vh',
+            maxHeight: '100vh',
             overflowY: 'auto',
             borderLeft: '1px solid rgba(22,32,36,0.08)',
             backgroundColor: 'rgba(255,255,255,0.5)',

@@ -27,7 +27,7 @@ export function useAuthGuard() {
     }
 
     if (appMode === 'demo') {
-      setSession(getDemoSession());
+      if (!physician) setSession(getDemoSession());
       setLoading(false);
       return () => {
         active = false;
@@ -56,7 +56,7 @@ export function useAuthGuard() {
     return () => {
       active = false;
     };
-  }, [appMode, physician, preferencesHydrated, setSession, clearSession, router, pathname]);
+  }, [appMode, physician, preferencesHydrated]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return {
     physician,
