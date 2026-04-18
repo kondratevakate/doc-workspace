@@ -119,6 +119,22 @@ export async function listVoiceDrafts(conditionKey: string): Promise<VoiceDraft[
   return payload.drafts;
 }
 
+export interface WeeklySummary {
+  visitsRecorded: number;
+  pingsCalled: number;
+  pingsViewed: number;
+  openDrafts: number;
+  weekStart: string;
+}
+
+export async function getWeeklySummary(): Promise<WeeklySummary> {
+  if (isDemoModeEnabled()) {
+    return { visitsRecorded: 3, pingsCalled: 2, pingsViewed: 4, openDrafts: 1, weekStart: new Date().toISOString() };
+  }
+  const payload = await apiRequest<{ ok: boolean; summary: WeeklySummary }>('/events/summary');
+  return payload.summary;
+}
+
 export async function commitVoiceDraft(
   draftId: number,
   input: {

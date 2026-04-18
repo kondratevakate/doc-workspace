@@ -57,6 +57,14 @@ type TranslationKey =
   | 'today.noUnresolvedDrafts'
   | 'today.refreshQueues'
   | 'today.loadQueuesError'
+  | 'weekly.thisWeek'
+  | 'weekly.visitsRecorded'
+  | 'weekly.followUpsDone'
+  | 'weekly.draftsOpen'
+  | 'weekly.narrativeAllPings'
+  | 'weekly.narrativeActiveWeek'
+  | 'weekly.narrativeGoodStart'
+  | 'weekly.narrativeReady'
   | 'drafts.title'
   | 'drafts.subtitle'
   | 'drafts.loading'
@@ -200,6 +208,14 @@ const messages: Record<AppLocale, Record<TranslationKey, string>> = {
     'today.noUnresolvedDrafts': 'No unresolved drafts.',
     'today.refreshQueues': 'Refresh queues',
     'today.loadQueuesError': 'Could not load queues.',
+    'weekly.thisWeek': 'This week',
+    'weekly.visitsRecorded': 'visits recorded',
+    'weekly.followUpsDone': 'follow-ups completed',
+    'weekly.draftsOpen': '{n} drafts still open',
+    'weekly.narrativeAllPings': 'All follow-ups done — great week.',
+    'weekly.narrativeActiveWeek': 'Active week — patients are covered.',
+    'weekly.narrativeGoodStart': 'Good start. More visits ahead.',
+    'weekly.narrativeReady': 'Ready to record your first visit.',
     'drafts.title': 'Drafts',
     'drafts.subtitle': 'Voice captures stay here until they are committed into a canonical case.',
     'drafts.loading': 'Loading drafts...',
@@ -342,6 +358,14 @@ const messages: Record<AppLocale, Record<TranslationKey, string>> = {
     'today.noUnresolvedDrafts': 'Неразобранных драфтов нет.',
     'today.refreshQueues': 'Обновить очереди',
     'today.loadQueuesError': 'Не удалось загрузить очереди.',
+    'weekly.thisWeek': 'На этой неделе',
+    'weekly.visitsRecorded': 'визитов записано',
+    'weekly.followUpsDone': 'звонков выполнено',
+    'weekly.draftsOpen': '{n} драфта ещё открыты',
+    'weekly.narrativeAllPings': 'Все напоминания выполнены — отличная неделя.',
+    'weekly.narrativeActiveWeek': 'Насыщенная неделя — пациенты охвачены.',
+    'weekly.narrativeGoodStart': 'Хорошее начало.',
+    'weekly.narrativeReady': 'Готово к записи первого визита.',
     'drafts.title': 'Драфты',
     'drafts.subtitle': 'Голосовые записи остаются здесь, пока не будут закоммичены в канонический кейс.',
     'drafts.loading': 'Загружаю драфты...',

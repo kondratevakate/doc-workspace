@@ -45,11 +45,23 @@
       "WebFetch(domain:pmc.ncbi.nlm.nih.gov)",
       "WebFetch(domain:www.nature.com)",
       "WebFetch(domain:www.sciencedirect.com)",
-      "WebFetch(domain:www.usa.philips.com)"
+      "WebFetch(domain:www.usa.philips.com)",
+      "Bash(node C:/Users/kondr/.claude/hooks/compliance-check.js)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(mkdir -p C:/Users/kondr/.claude/plugins/my-skills/skills/habit-design)",
+      "Bash(mkdir -p C:/Users/kondr/.claude/plugins/my-skills/skills/compliance-review)",
+      "Bash(node --test --test-isolation=none)",
+      "Bash(npm install *)",
+      "Bash(curl -sf http://localhost:3003/api/health)",
+      "Bash(curl -sf http://localhost:3003/ -L -o /dev/null -w \"final status: %{http_code}\\\\n\")",
+      "Bash(npx kill-port *)",
+      "Bash(PORT=3000 next dev --port 3000)",
+      "Bash(npm run *)"
     ],
     "additionalDirectories": [
       "C:\\Users\\kondr\\.claude\\plugins\\my-skills\\.claude-plugin",
-      "C:\\Users\\kondr\\.claude\\plugins\\my-skills\\skills\\commit"
+      "C:\\Users\\kondr\\.claude\\plugins\\my-skills\\skills\\commit",
+      "C:\\Users\\kondr\\.claude"
     ]
   }
 }

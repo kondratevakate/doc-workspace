@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createVoiceDraft, getVoiceDraft } from '@/src/lib/api';
+import { track } from '@/src/lib/track';
 import type { VoiceDraft } from '@/src/lib/types';
 
 // ── Web Speech API type shims (not in standard TS lib) ──────────────────────
@@ -158,6 +159,7 @@ export function useVoiceCapture({ locale, activeConditionKey }: UseVoiceCaptureO
     setStatus('uploading');
     setInfo('Uploading voice note...');
     setError(null);
+    const uploadStart = Date.now();
     try {
       const audioBase64 = await blobToBase64(blob);
       const created = await createVoiceDraft({
@@ -165,6 +167,10 @@ export function useVoiceCapture({ locale, activeConditionKey }: UseVoiceCaptureO
         audioBase64,
         contentType,
         languageCode: localeRef.current === 'ru' ? 'ru' : 'en',
+      });
+      track('audio_uploaded', {
+        fileSizeMb: Math.round(blob.size / 1024 / 1024 * 100) / 100,
+        uploadMs: Date.now() - uploadStart,
       });
       hydrateDraft(created);
       setInfo('Voice note received. Building draft...');
@@ -185,6 +191,9 @@ export function useVoiceCapture({ locale, activeConditionKey }: UseVoiceCaptureO
         hydrateDraft(current);
         const ready = current.status === 'done' || Boolean(current.transcript);
         if (ready) {
+          track('transcript_received', {
+            wordCount: current.transcript ? current.transcript.split(/\s+/).filter(Boolean).length : 0,
+          });
           setStatus('review');
           setInfo(current.reviewState === 'ready' ? 'Draft ready for review.' : 'Draft needs review before commit.');
           return;
@@ -215,10 +224,12 @@ export function useVoiceCapture({ locale, activeConditionKey }: UseVoiceCaptureO
       };
 
       recorder.onstop = async () => {
+        const durationSec = elapsed;
         stopTimer();
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType || 'audio/webm' });
-        stream.getTracks().forEach((track) => track.stop());
+        stream.getTracks().forEach((t) => t.stop());
         try { recognitionRef.current?.stop(); } catch { /* ignore */ }
+        track('recording_stopped', { durationSec });
         await uploadBlobInternal(blob, recorder.mimeType || 'audio/webm');
       };
 
@@ -227,6 +238,7 @@ export function useVoiceCapture({ locale, activeConditionKey }: UseVoiceCaptureO
       setStatus('recording');
       startTimer();
       startSpeechRecognition(localeRef.current === 'ru' ? 'ru-RU' : 'en-US');
+      track('recording_started', { conditionKey: conditionKeyRef.current, source: 'voice' });
     } catch {
       setError('Microphone access denied.');
       setStatus('idle');

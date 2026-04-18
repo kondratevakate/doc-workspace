@@ -1,0 +1,16 @@
+[Unit]
+Description=Doctor Voicebot frontend (Next.js)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/srv/voicebot/web
+EnvironmentFile=/srv/voicebot/web/.env.production
+ExecStart=/usr/bin/node /srv/voicebot/web/server.js
+Restart=always
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

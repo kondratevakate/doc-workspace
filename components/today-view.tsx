@@ -12,6 +12,7 @@ import { useAppStore } from '@/src/store/app-store';
 import { CaseCard } from './case-card';
 import { LoadingState } from './loading-state';
 import { SectionCard } from './section-card';
+import { WeeklyCard } from './weekly-card';
 import { WorkspaceShell } from './workspace-shell';
 
 export function TodayView() {
@@ -97,6 +98,8 @@ export function TodayView() {
       <Button variant="outlined" onClick={() => setRefreshKey((value) => value + 1)}>
         {t('today.refreshQueues')}
       </Button>
+
+      <WeeklyCard />
     </WorkspaceShell>
   );
 }
